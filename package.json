@@ -1,0 +1,19 @@
+{
+  "name": "EDT_BOT_V2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "start": "nodemon ."
+  },
+  "author": "j-peguet",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "http": "^0.0.1-security",
+    "jsdom": "^16.7.0",
+    "nodemon": "^2.0.12"
+  }
+}
