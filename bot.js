@@ -117,13 +117,13 @@ client.on('raw', event => {
                         
                         let memberRoles = member.roles.cache.map(role => role.id);
                         
-                        let coursRoles = config.roles.map(role => role.id_role_test);
+                        let coursRoles = config.roles.map(role => role.id_role);
                         
                         if(!memberRoles.some(r => coursRoles.includes(r))){
                             let roleattr = config.roles.find(role => role.emoji === event.d.emoji.name);
-                            member.roles.add(`${roleattr.id_role_test}`)
-                            if (roleattr.group_test) {
-                                member.roles.add(`${roleattr.group_test}`)
+                            member.roles.add(`${roleattr.id_role}`)
+                            if (roleattr.group) {
+                                member.roles.add(`${roleattr.group}`)
                             }
                             console.log('Ajout du role')
                         }
