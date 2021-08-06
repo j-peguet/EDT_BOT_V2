@@ -1,19 +1,16 @@
-const http = require("http");
 const axios = require('axios');
-const jsdom = require("jsdom");
 const Discord = require('discord.js');
+const jsdom = require("jsdom");
 
-module.exports = function(params) {
-
-    var who = (params[0].includes(".") ? params[0] : params[1]);
-    var sDate = (!params[0].includes(".") ? params[0] : params[1]);
+async function getEDT(who, researchDate) {
 
     let embededMsg = new Discord.MessageEmbed();
+    let dayOfWeek = researchDate.day();
 
     // Tableau prenant la position des cases (propriété CSS left), pour définir les jours de la semaine
     let sizeForDay = ['0' ,'103.1200%', '122.5200%', '141.9200%', '161.3200%', '180.7200%'];
 
-    axios.get(`https://edtmobiliteng.wigorservices.net/WebPsDyn.aspx?action=posEDTBEECOME&serverid=Camp&Tel=${who}&date=${sDate}`, {headers: {'Content-Type': 'text/html'}})
+    await axios.get(`https://edtmobiliteng.wigorservices.net/WebPsDyn.aspx?action=posEDTBEECOME&serverid=Camp&Tel=${who}&date=${researchDate.format('MM/DD/YYYY').toString()}`, {headers: {'Content-Type': 'text/html'}})
         .then(function (response) {
 
             let dom = new jsdom.JSDOM(response.data);
@@ -38,9 +35,6 @@ module.exports = function(params) {
                     
             })
 
-            date = new Date;
-            dayOfWeek = date.getDay();
-
             // Pour chaque cour du jour de la semaine actuel, affichage des cours
             week[dayOfWeek].forEach(elem => {
                 let mat = {
@@ -49,12 +43,24 @@ module.exports = function(params) {
                     salle: elem.querySelector('.TCSalle').innerHTML,
                     prof: elem.querySelector('.TCProf').innerHTML
                 }
+
+                // Pour le prof, ont récupère uniquement son nom et prénom (séparé par un <br)
+                // Puis ont met la première lettre en majuscule de chaque prénom/nom
+                mat.prof = mat.prof.split('<br>')[0].replace(/(^\w|\s\w)/g, m => m.toUpperCase());
                 
 
                 result.push(mat);
             })
 
-            console.log(result);
+            // Check si des cours ont été récupé
+            if(result.length != 0){
+                result.forEach(elem => {
+                    embededMsg.addField(`${elem.heure}`, `${elem.cours} \n ${elem.salle} \n ${elem.prof}`, false);
+                })
+            } else {
+                // Sinon affichage d'une message spécifique
+                embededMsg.addField('Pas de cours prévus ce jour.');
+            }
         })
         .catch(function (error) {
             // handle error
@@ -64,3 +70,5 @@ module.exports = function(params) {
     return embededMsg;
 
 }
+
+module.exports = { getEDT };

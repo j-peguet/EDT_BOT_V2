@@ -2,9 +2,15 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
+const moment = require('moment');
 
 const botSettings = require('./params.json');
 const roleSettings = require('./role-config.json')
+
+/**
+ * utils
+ */
+const checkDay = require('./utils/checkDay.js');
 
 /**
  * commands
@@ -16,7 +22,7 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
   
-client.on('message', msg => {
+client.on('message', async msg => {
 
     if (msg.content.startsWith(botSettings.prefix)) {
         // Tableau contenant la commande et les arguments
@@ -31,12 +37,66 @@ client.on('message', msg => {
 
         console.log(messageContent)
         if(botSettings.edt.includes(command)){
-            console.log('Start');
-            returnMessage = edt(messageContent);
-            console.log('End');
-            returnMessage.title = "Emploi du temps";
-            returnMessage.color =  0xcb2a17;
-            msg.channel.send(returnMessage);
+            let who = '';
+            let date = moment();
+            let researchDate = '';
+            let errorMsg = '';
+            let error = false;
+
+            // Check sur le premier param est bien prenom.nom
+            if(messageContent[0] == undefined || !messageContent[0].includes(".")) {
+                errorMsg = 'Merci de renseigner une identitée, sous la forme prenom.nom';
+                error = true;
+            } else {
+                who = messageContent[0]
+            }
+            
+            // Si aucune date n'est founis, la date du jour est choisie
+            if(messageContent[1] == undefined) {
+                researchDate = date
+            } else {
+                // Sinon une vérification du format en fait
+                let testDate = moment(messageContent[1], 'DD/MM/YYYY')
+                if (!testDate.isValid()){
+                    errorMsg = 'Format de la date incorrect, doit être DD ou DD/MM ou DD/MM/YYYY';
+                  error = true;
+                } else {
+                    researchDate = testDate;
+                }
+            }
+
+            // Si aucune erreurs dans les arguments, ont lance la requête
+            if(!error){
+                loadingMessage = new Discord.MessageEmbed();
+                loadingMessage.description = 'Emploi du temps en cours de chargement...';
+
+                // Si la commande est faite un weekend, ont recherche le lundi suivant
+                if(checkDay.isWeekend(researchDate)){
+                    researchDate = checkDay.nextMonday(researchDate);
+                    loadingMessage.description = 'Le jour demandé est un weekend, recherche du lundi suivant. \n\n Emploi du temps en cours de chargement...';
+                }
+                loadingMessage.title = `Emploi du temps ${researchDate.format('DD/MM/YYYY').toString()}`;
+                loadingMessage.color =  0xcb2a17;
+
+                // Envoi du message de chargement
+                edtDescription = await msg.channel.send(loadingMessage);
+    
+                returnMessage = await edt.getEDT(who, researchDate);
+                
+                // Envoi du message final
+                returnMessage.title = `Emploi du temps ${researchDate.format('DD/MM/YYYY').toString()}`;
+                returnMessage.color = 0xcb2a17;
+                edtDescription.edit(returnMessage);
+            } else {
+                // Lors d'une erreur, le message est renvoyé
+                errorMessage = new Discord.MessageEmbed();
+                errorMessage.title = 'Emploi du temps';
+                errorMessage.color =  0xcb2a17;
+                errorMessage.description = errorMsg;
+                await msg.channel.send(errorMessage);
+            }
+
+            
         }
 
         if(botSettings.role.includes(command) && memberRoles.includes(roleSettings.id_admin_role)){
