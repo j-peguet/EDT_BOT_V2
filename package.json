@@ -2,15 +2,20 @@
   "name": "EDT_BOT_V2",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "index.js",
   "scripts": {
-    "start": "nodemon ."
+    "start": "cross-env NODE_ENV=prod & nodemon .",
+    "dev": "cross-env NODE_ENV=local nodemon ."
   },
   "author": "j-peguet",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
     "axios": "^0.21.1",
-    "discord.js": "^12.5.3",
+    "cross-env": "^7.0.3",
+    "discord-api-types": "^0.22.0",
+    "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "http": "^0.0.1-security",
     "jsdom": "^16.7.0",

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] })
 const fs = require('fs');
 const moment = require('moment');
 
@@ -15,8 +15,8 @@ const checkDay = require('./utils/checkDay.js');
 /**
  * commands
  */
-const edt = require("./cmd/edt.js");
-const role = require("./cmd/edt.js");
+const edt = require("./commands/edt.js");
+const role = require("./commands/edt.js");
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
