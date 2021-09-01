@@ -32,8 +32,15 @@ npm start
 
 ## Deploiement des commandes sur le serveur
 Pour que les commandes soient disponibles sur le serveur il est nécessaire de les déployer.
-
+### En local
 ```bash
-cd EDT_BOT_V2/
-node deploy-commands.js
+yarn deploy-dev
+# ou
+npm deploy-dev
+```
+### En production
+```bash
+yarn deploy-prod
+# ou
+npm deploy-prod
 ```

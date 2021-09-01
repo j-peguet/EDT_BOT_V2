@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=prod & nodemon .",
-    "dev": "cross-env NODE_ENV=local nodemon ."
+    "dev": "cross-env NODE_ENV=local nodemon .",
+    "deploy-prod": "cross-env NODE_ENV=prod node deploy-commands.js",
+    "deploy-dev": "cross-env NODE_ENV=local node deploy-commands.js"
   },
   "author": "j-peguet",
   "license": "ISC",
